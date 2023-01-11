@@ -13,6 +13,12 @@
 int queue_data[QUEUE_SIZE];     // キュー配列
 int queue_head;         // キューの先頭
 int queue_end;          // キューの末尾
+int queue_num;
+
+void InitQueue();
+int Enqueue(int value);
+int Dequeue(int* pop_data);
+void queuePrint();
 
 int main()
 {
@@ -32,7 +38,7 @@ int main()
     queuePrint();
 
     // Dequeue
-    for(int i = 0; i < 2; i++)
+    for (int i = 0; i < 2; i++)
     {
         Dequeue(&p);
         queuePrint();
@@ -53,57 +59,58 @@ int main()
 // queue初期化関数
 void InitQueue()
 {
-    for(int i = 0; i < QUEUE_SIZE; i++)
+    for (int i = 0; i < QUEUE_SIZE; i++)
     {
         queue_data[i] = DEFAULT;    // キュー内初期化
     }
     queue_head = 0;     // キューの先頭 0
     queue_end = 0;      // キューの末尾 0
+    queue_num = 0;
 }
 
 // queueにデータ入れる関数
 int Enqueue(int value)
 {
-    if(queue_end > QUEUE_SIZE)
-    {
-        queue_end = 0;
-    }
-
-    if((queue_end - queue_head) > QUEUE_SIZE)
-    {
-        queue_data[queue_end] = value; //キューの末尾のvalue追加
-        queue_end++;        // キューの末尾を増やしとく
+    
+    if (queue_num < QUEUE_SIZE) {
+        queue_data[(queue_head + queue_num) % QUEUE_SIZE] = value;
+        queue_num++;
         return SUCCESS;
     }
-    else
+    else {
         return FAILURE;
-
+    }
+    
 }
 
 int Dequeue(int* pop_data)
 {
-    if(queue_head > QUEUE_SIZE)
-    {
-        queue_head = 0;
-    }
-
-    if((queue_end - queue_head) >= 0)
-    {
+    if (queue_num > 0) {
         *pop_data = queue_data[queue_head];
-        queue_head++;   // キューの先頭1増やす
+        queue_head = (queue_head + 1) % QUEUE_SIZE;
+        queue_num--;
         return SUCCESS;
     }
-    else 
+    else {
         return FAILURE;
+    }
 }
 
 void queuePrint()
 {
-    int length = queue_end - queue_head;
-    printf("Queue");
-    for(int i = 0; i < length; i++)
-    {
-        printf("%2d", queue_data[i]);
+   
+    int i;
+
+    printf("queue [");
+    for (i = 0; i < QUEUE_SIZE; i++) {
+        if ((queue_head + queue_num <= QUEUE_SIZE && queue_head <= i && i < queue_head + queue_num)
+            || (queue_head + queue_num > QUEUE_SIZE && (queue_head <= i || i < (queue_head + queue_num) % QUEUE_SIZE))) {
+            printf("%3d", queue_data[i]);
+        }
+        else {
+            printf("%3c", '.');       /* queue に入っていないデータは表示しない */
+        }
     }
-    printf("\n");
+    printf("]\n");
+    
 }
